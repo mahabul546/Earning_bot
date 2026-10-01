@@ -6,7 +6,7 @@ from telebot import types
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # এখানে তোমার নিজের Telegram User ID বসাবে
-ADMIN_ID = 123456789
+ADMIN_ID = 7834320405
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
