@@ -43,8 +43,8 @@ def main_menu():
     )
 
     keyboard.row(
-        "🏠 Home",
-        "👥 Referral"
+        "👥 Referral",
+        " task"
     )
 
     keyboard.row(
