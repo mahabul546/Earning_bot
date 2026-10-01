@@ -1,0 +1,20 @@
+name: Bot Runner
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */5 * * *'
+  push:
+    branches: [ main ]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install -r requirements.txt
+      - run: python main.py
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
