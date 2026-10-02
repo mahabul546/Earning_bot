@@ -53,7 +53,8 @@ def main_menu():
     )
 
     keyboard.row(
-        "🆘 Support"
+        "🆘 Support",
+        "🛅Admin penel"
     )
 
     return keyboard
