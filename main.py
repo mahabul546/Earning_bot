@@ -120,8 +120,8 @@ def start(message):
         bot.send_message(
             message.chat.id,
             "⏳ Pending Request\n\n"
-            "আমার দেখতে পারছি আপনি আইডি এখনো একটিভ করেন নাই কিভাবে আইডি একটিভ করবে। তার ভিডিও নিচে দেওয়া হলো"
-            "আপনার Request Approve করবেন।\n\n"
+            "আমার দেখতে পারছি আপনি আইডি এখনো একটিভ করেন নাই কিভাবে আইডি একটিভ করবেন তার ভিডিও নিচে দেওয়া হলো"
+            "https://youtube.com/shorts/q7sZG9w9PhA?si=rAJJBh1VculldGmW।\n\n"
             f"👤 নাম: {name}\n"
             f"🆔 User ID: {message.from_user.id}"
         )
