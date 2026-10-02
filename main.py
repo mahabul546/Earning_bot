@@ -59,7 +59,30 @@ def main_menu():
 
     return keyboard
 
+# =========================
+# ADMIN PANEL
+# =========================
 
+@bot.message_handler(func=lambda message: message.text == "🗂️ Admin penel")
+def admin_panel(message):
+
+    # শুধু Admin ব্যবহার করতে পারবে
+    if message.from_user.id != ADMIN_ID:
+        bot.send_message(
+            message.chat.id,
+            "❌ আপনার অনুমতি নেই!"
+        )
+        return
+
+    bot.send_message(
+        message.chat.id,
+        "🛠️ Admin Panel\n\n"
+        "এখান থেকে আপনি Bot পরিচালনা করতে পারবেন।\n\n"
+        "👥 Users\n"
+        "📋 Pending Requests\n"
+        "📢 Notice\n"
+        "📊 Statistics"
+    )
 # =========================
 # START
 # =========================
