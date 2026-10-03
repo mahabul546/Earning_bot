@@ -9,7 +9,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     text = f"""⏳ Start : পেন্ডিং
 
- আপনার আইডি unactive কিভাবে একটিভ করবেন নিচে তার ভিডিও দেওয়া হলো 👇
+📮 Post : আপনার আইডি unactive কিভাবে একটিভ করবেন নিচে তার ভিডিও দেওয়া হলো 👇
 
 📩 Telegram : @mahabul546
 📞 WhatsApp : 0
@@ -17,20 +17,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 👤 ইউজার নাম : @{user.username if user.username else user.first_name}
 🆔 ইউজার আইডি : {user.id}
 """
-    # Video বাটন মাঝখানে থাকবে - লিংক দেখা যাবে না
+    # লিংক এখন লেখায় নাই, শুধু বাটনে আছে - এটাই প্রাইভেট
     keyboard = [
         [InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]
     ]
+    await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard), disable_web_page_preview=True)
 
-    # এডমিনের জন্য আলাদা বাটন
     admin_text = f"🔔 New User\nName: {user.full_name}\nUsername: @{user.username}\nID: {user.id}"
-    admin_kb = [[InlineKeyboardButton("✅ Approve", callback_data=f"approve_{user.id}"), InlineKeyboardButton("❌ Reject", callback_data=f"reject_{user.id}")]]
-
+    kb = [[InlineKeyboardButton("✅ Approve", callback_data=f"approve_{user.id}"), InlineKeyboardButton("❌ Reject", callback_data=f"reject_{user.id}")]]
     try:
-        # ইউজারকে মেসেজ + মাঝখানে ভিডিও বাটন
-        await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
-        # এডমিনকে নোটিফিকেশন
-        await context.bot.send_message(ADMIN_ID, admin_text, reply_markup=InlineKeyboardMarkup(admin_kb))
+        await context.bot.send_message(ADMIN_ID, admin_text, reply_markup=InlineKeyboardMarkup(kb))
     except: pass
 
 async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
