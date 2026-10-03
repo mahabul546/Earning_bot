@@ -3,7 +3,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = 7834320405
+ADMIN_ID = 7353239726
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -11,15 +11,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 📮 Post : আপনার আইডি unactive কিভাবে একটিভ করবেন নিচে তার ভিডিও দেওয়া হলো 👇
 
-🎬 ভিডিওর লিংক : https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7
-
 📩 Telegram : @mahabul546
 📞 WhatsApp : 0
 
 👤 ইউজার নাম : @{user.username if user.username else user.first_name}
 🆔 ইউজার আইডি : {user.id}
 """
-    await update.message.reply_text(text)
+    # ভিডিও বাটন - লিংক হাইড থাকবে
+    keyboard = [
+        [InlineKeyboardButton("🎬 আইডি একটিভ করার ভিডিও দেখুন", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]
+    ]
+    await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
     admin_text = f"🔔 New User\nName: {user.full_name}\nUsername: @{user.username}\nID: {user.id}"
     kb = [[InlineKeyboardButton("✅ Approve", callback_data=f"approve_{user.id}"), InlineKeyboardButton("❌ Reject", callback_data=f"reject_{user.id}")]]
     try:
@@ -31,11 +34,11 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await q.answer()
     uid = q.data.split("_")[1]
     if "approve" in q.data:
-        await context.bot.send_message(chat_id=uid, text="""✅ আপনার আইডি Active করা হয়েছে!
-
-কিভাবে bot এ কাজ করবেন তার ভিডিও নিচে দেওয়া হলো 👇
-
-https://youtube.com/shorts/IpF6C6kCxE4?si=dDLQaFihkH9UnYz0""")
+        text = "✅ আপনার আইডি Active করা হয়েছে!\n\nকিভাবে bot এ কাজ করবেন তার ভিডিও নিচে দেওয়া হলো 👇"
+        keyboard = [
+            [InlineKeyboardButton("🎬 কাজ করার ভিডিও দেখুন", url="https://youtube.com/shorts/IpF6C6kCxE4?si=dDLQaFihkH9UnYz0")]
+        ]
+        await context.bot.send_message(chat_id=uid, text=text, reply_markup=InlineKeyboardMarkup(keyboard))
         await q.edit_message_text(f"✅ {uid} কে Approve করা হয়েছে।")
     else:
         await context.bot.send_message(chat_id=uid, text="❌ আপনার আইডি Reject করা হয়েছে।")
