@@ -5,6 +5,16 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Cont
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = 7834320405
 
+USER_MENU = [
+    ["👥 My Referrals", "🎯 Tasks"],
+    ["💰 Balance", "📢 Notice"],
+    ["💬 Support"]
+]
+ADMIN_MENU = [
+    ["👥 My Referrals", "🎯 Tasks"],
+    ["💰 Balance", "📢 Notice"],
+    ["💬 Support", "⚙️ Admin Panel"]
+]
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     text = f"""⏳ Start : পেন্ডিং
