@@ -18,10 +18,6 @@ ADMIN_MENU = [
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    if user.id == ADMIN_ID:
-        main_menu = ReplyKeyboardMarkup(ADMIN_MENU, resize_keyboard=True)
-    else:
-        main_menu = ReplyKeyboardMarkup(USER_MENU, resize_keyboard=True)
 
     text = f"""⏳ Start : পেন্ডিং
 
@@ -37,7 +33,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         [InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]
     ]
     await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard), disable_web_page_preview=True)
-    await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=main_menu)
+
+    # === CHANGE 1: start এ আর বাটন পাঠাবো না, শুধু Admin হলে তার Admin Panel যাবে ===
+    if user.id == ADMIN_ID:
+        main_menu = ReplyKeyboardMarkup(ADMIN_MENU, resize_keyboard=True)
+        await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=main_menu)
 
     admin_text = f"🔔 New User\nName: {user.full_name}\nUsername: @{user.username}\nID: {user.id}"
     kb = [[InlineKeyboardButton("✅ Approve", callback_data=f"approve_{user.id}"), InlineKeyboardButton("❌ Reject", callback_data=f"reject_{user.id}")]]
@@ -52,6 +52,11 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if "approve" in q.data:
         kb = [[InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]]
         await context.bot.send_message(chat_id=uid, text="✅ আপনার আইডি Active করা হয়েছে!", reply_markup=InlineKeyboardMarkup(kb))
+
+        # === CHANGE 2: এই ২ লাইন নতুন যোগ করলাম - Approve এর পরেই বাটন যাবে ===
+        main_menu = ReplyKeyboardMarkup(USER_MENU, resize_keyboard=True)
+        await context.bot.send_message(chat_id=uid, text="নিচ থেকে সিলেক্ট করুন 👇", reply_markup=main_menu)
+
         await q.edit_message_text(f"✅ {uid} কে Approve করা হয়েছে!")
     else:
         await context.bot.send_message(chat_id=uid, text="❌ আপনার আইডি Reject করা হয়েছে!")
