@@ -36,10 +36,10 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if "approve" in q.data:
         kb = [[InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]]
         await context.bot.send_message(chat_id=uid, text="✅ আপনার আইডি Active করা হয়েছে!", reply_markup=InlineKeyboardMarkup(kb))
-        await q.edit_message_text(f"✅ {uid} কে Approve করা হয়েছে।")
+        await q.edit_message_text(f"✅ {uid} কে Approve করা হয়েছে!")
     else:
-        await context.bot.send_message(chat_id=uid, text="❌ আপনার আইডি Reject করা হয়েছে।")
-        await q.edit_message_text(f"❌ {uid} কে Reject করা হয়েছে।") {uid} কে Reject করা হয়েছে।")
+        await context.bot.send_message(chat_id=uid, text="❌ আপনার আইডি Reject করা হয়েছে!")
+        await q.edit_message_text(f"❌ {uid} কে Reject করা হয়েছে!")
 
 app = Application.builder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
