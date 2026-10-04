@@ -212,7 +212,21 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg += f"{i}. {h['amount']}৳ - {h['status']}\n📱 {h['method']} : {h['number']}\n📅 {h['date']}\n\n"
         await update.message.reply_text(msg)
         return
+  
+    if text == "🎯 Tasks":
+        kb = ReplyKeyboardMarkup([
+            ["📧 Gmail sell", "💬 Whatsapp sell"],
+            ["🎥 Videos earn", "▶️ YouTube"],
+            ["💳 Recharge", "🌐 Website visit"],
+            ["🔙 Back"]
+        ], resize_keyboard=True)
+        await update.message.reply_text("🎯 টাস্ক সিলেক্ট করুন 👇", reply_markup=kb)
+        return
 
+    if text in ["📧 Gmail sell", "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
+        await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
+        return
+        
     if text == "👥 My Referrals":
         total_ref = len(u.get("referrals", []))
         withdraw_ref = u.get("withdraw_ref", 0)
