@@ -6,6 +6,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Mess
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = 7834320405
 DATA_FILE = "data.json"
+REQUIRED_CHANNEL = "@mhabul546"
 
 USER_MENU = [
     ["👥 My Referrals", "🎯 Tasks"],
@@ -31,10 +32,15 @@ def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f)
 
+async def check_joined(bot, user_id):
+    try:
+        m = await bot.get_chat_member(REQUIRED_CHANNEL, user_id)
+        return m.status in ["member", "administrator", "creator", "owner"]
+    except:
+        return False
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-
-    # --- শুধু রেফার এর জন্য এইটুকু Add করলাম ---
     data = load_data()
     args = context.args
     if args and args[0]!= str(user.id):
@@ -48,7 +54,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 data[ref_id] = {"balance": 20, "referrals": [str(user.id)], "withdraw_ref": 0, "referred_by": None}
             save_data(data)
-    # --- শেষ ---
 
     text = f"""⏳ Start : পেন্ডিং
 
@@ -76,17 +81,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
+
+    if q.data == "check_join":
+        joined = await check_joined(context.bot, q.from_user.id)
+        if joined:
+            await q.edit_message_text("✅ ধন্যবাদ! আপনি জয়েন করেছেন। এখন আপনি পেমেন্ট নিতে পারবেন।")
+        else:
+            await q.answer("❌ এখনো জয়েন করেন নাই! আগে জয়েন করুন", show_alert=True)
+        return
+
     uid = q.data.split("_")[1]
     if "approve" in q.data:
         kb = [[InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]]
         await context.bot.send_message(chat_id=uid, text="✅ আপনার আইডি Active করা হয়েছে!", reply_markup=InlineKeyboardMarkup(kb))
-
         if int(uid) == ADMIN_ID:
             main_menu = ReplyKeyboardMarkup(ADMIN_MENU, resize_keyboard=True)
         else:
             main_menu = ReplyKeyboardMarkup(USER_MENU, resize_keyboard=True)
         await context.bot.send_message(chat_id=uid, text="নিচ থেকে সিলেক্ট করুন 👇", reply_markup=main_menu)
-
         await q.edit_message_text(f"✅ {uid} কে Approve করা হয়েছে!")
     else:
         await context.bot.send_message(chat_id=uid, text="❌ আপনার আইডি Reject করা হয়েছে!")
@@ -96,7 +108,40 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
     user_id = str(update.effective_user.id)
 
-    # --- শুধু My Referrals এর জন্য ---
+    if text == "📢 Notice":
+        msg = """পেমেন্ট পাওয়ার নিয়ম
+
+পেমেন্ট পেতে হলে নিচের ২টি চ্যানেলেই জয়েন/সাবস্ক্রাইব করা বাধ্যতামূলক 👇
+
+📱 Telegram Channel:
+👉 https://t.me/mhabul546
+
+▶️ YouTube Channel:
+👉 https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ
+
+⚠️ গুরুত্বপূর্ণ:
+উপরের যেকোনো একটি চ্যানেলে জয়েন/সাবস্ক্রাইব না থাকলে পেমেন্ট দেওয়া হবে না।"""
+        kb = [
+            [InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")],
+            [InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")]
+        ]
+        await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(kb))
+        return
+
+    if text == "💰 Balance":
+        joined = await check_joined(context.bot, update.effective_user.id)
+        if not joined:
+            kb = [
+                [InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],
+                [InlineKeyboardButton("✅ Joined Check", callback_data="check_join")]
+            ]
+            await update.message.reply_text("❌ পেমেন্ট নিতে হলে আগে আমাদের চ্যানেলে জয়েন করুন, তারপর Check বাটনে চাপ দিন!", reply_markup=InlineKeyboardMarkup(kb))
+            return
+        data = load_data()
+        bal = data.get(user_id, {}).get("balance", 0)
+        await update.message.reply_text(f"💰 আপনার ব্যালেন্স: {bal} টাকা")
+        return
+
     if text == "👥 My Referrals":
         data = load_data()
         if user_id not in data:
@@ -107,7 +152,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         withdraw_ref = d.get("withdraw_ref", 0)
         bot_username = (await context.bot.get_me()).username
         ref_link = f"https://t.me/{bot_username}?start={user_id}"
-
         msg = f"""💸 রেফার করে অটোমেটিক ইনকাম করুন!
 
 💲 প্রতি রেফার ২০ টাকা করে পাবেন
@@ -126,7 +170,6 @@ Withdraw Referral বাড়বে।
         await update.message.reply_text(msg)
         return
 
-    # আগের মতোই থাকবে
     await update.message.reply_text(f"আপনি ক্লিক করেছেন: {update.message.text}")
 
 app = Application.builder().token(TOKEN).build()
