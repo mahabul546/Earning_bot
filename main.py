@@ -18,7 +18,6 @@ ADMIN_MENU = [
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-
     text = f"""⏳ Start : পেন্ডিং
 
 📮 Post : আপনার আইডি unactive কিভাবে একটিভ করবেন নিচে তার ভিডিও দেওয়া হলো 👇
@@ -29,12 +28,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 👤 ইউজার নাম : @{user.username if user.username else user.first_name}
 🆔 ইউজার আইডি : {user.id}
 """
-    keyboard = [
-        [InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]
-    ]
+    keyboard = [[InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]]
     await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard), disable_web_page_preview=True)
 
-    # === CHANGE 1: start এ আর বাটন পাঠাবো না, শুধু Admin হলে তার Admin Panel যাবে ===
     if user.id == ADMIN_ID:
         main_menu = ReplyKeyboardMarkup(ADMIN_MENU, resize_keyboard=True)
         await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=main_menu)
@@ -53,8 +49,10 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         kb = [[InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]]
         await context.bot.send_message(chat_id=uid, text="✅ আপনার আইডি Active করা হয়েছে!", reply_markup=InlineKeyboardMarkup(kb))
 
-        # === CHANGE 2: এই ২ লাইন নতুন যোগ করলাম - Approve এর পরেই বাটন যাবে ===
-        main_menu = ReplyKeyboardMarkup(USER_MENU, resize_keyboard=True)
+        if int(uid) == ADMIN_ID:
+            main_menu = ReplyKeyboardMarkup(ADMIN_MENU, resize_keyboard=True)
+        else:
+            main_menu = ReplyKeyboardMarkup(USER_MENU, resize_keyboard=True)
         await context.bot.send_message(chat_id=uid, text="নিচ থেকে সিলেক্ট করুন 👇", reply_markup=main_menu)
 
         await q.edit_message_text(f"✅ {uid} কে Approve করা হয়েছে!")
