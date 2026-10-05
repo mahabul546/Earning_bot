@@ -201,7 +201,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"আপনি {text} সিলেক্ট করেছেন। এখন আপনার {text} নাম্বার দিন:")
         return
 
-    if text "📜 Balance History":
+    if text == "📜 Balance History":
         pending = sum([h["amount"] for h in u["history"] if h["status"]=="PENDING"])
         total_times = len(u["history"])
         msg = f"📜 BALANCE HISTORY\n\n⏳ পেন্ডিং ব্যালেন্স: {pending} টাকা\n🔄 মোট উইথড্র: {total_times} বার\n\n📜 উইথড্র হিস্টরি:\n"
