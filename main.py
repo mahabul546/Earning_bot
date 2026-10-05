@@ -8,8 +8,8 @@ ADMIN_ID = 7834320405
 DATA_FILE = "data.json"
 REQUIRED_CHANNEL = "@mhabul546"
 
-USER_MENU = [["👥 My Referrals", "🎯 Tasks"], ["💰 Balance", "📢 Notice"], ["💬 Support"]]
-ADMIN_MENU = [["👥 My Referrals", "🎯 Tasks"], ["💰 Balance", "📢 Notice"], ["💬 Support", "⚙️ Admin Panel"]]
+USER_MENU = [["👥 My Referrals", "🎯 Tasks"], ["💰 Balance", "📢 Notice"], ["💬 Support", "👤 My accounts"]]
+ADMIN_MENU = [["👥 My Referrals", "🎯 Tasks"], ["💰 Balance", "📢 Notice"], ["💬 Support", "👤 My accounts"], ["⚙️ Admin Panel"]]
 
 def load_data():
     if not os.path.exists(DATA_FILE): return {}
