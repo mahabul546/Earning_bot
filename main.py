@@ -171,7 +171,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 আপনার ব্যালেন্স💰 : {bal} টাকা
 
 মিনিম্যাম উইথড্র 50 টাকা"""
-        kb = ReplyKeyboardMarkup([["💸 Payout", "👤 My accounts"], ["🔙 Back"]], resize_keyboard=True)
+        kb = ReplyKeyboardMarkup([["💸 Payout", "📜 Balance History"], ["🔙 Back"]], resize_keyboard=True)
         await update.message.reply_text(msg, reply_markup=kb)
         return
 
@@ -201,10 +201,10 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(f"আপনি {text} সিলেক্ট করেছেন। এখন আপনার {text} নাম্বার দিন:")
         return
 
-    if text == "👤 My accounts":
+    if text "📜 Balance History":
         pending = sum([h["amount"] for h in u["history"] if h["status"]=="PENDING"])
         total_times = len(u["history"])
-        msg = f"👤 MY ACCOUNT\n\n⏳ পেন্ডিং ব্যালেন্স: {pending} টাকা\n🔄 মোট উইথড্র: {total_times} বার\n\n📜 উইথড্র হিস্টরি:\n"
+        msg = f"📜 BALANCE HISTORY\n\n⏳ পেন্ডিং ব্যালেন্স: {pending} টাকা\n🔄 মোট উইথড্র: {total_times} বার\n\n📜 উইথড্র হিস্টরি:\n"
         if not u["history"]:
             msg += "কোনো হিস্টরি নেই"
         else:
