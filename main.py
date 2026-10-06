@@ -212,6 +212,22 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg)
         return
 
+    if text == "👤 My accounts":
+        user = update.effective_user
+        ref_count = len(u.get("referrals", []))
+        total_withdraw = len(u.get("history", []))
+        msg = (
+            f"👤 MY ACCOUNT\n\n"
+            f"🆔 ID: {user.id}\n"
+            f"👤 Name: {user.first_name}\n"
+            f"💰 Balance: {u['balance']} টাকা\n"
+            f"👥 Total Refer: {ref_count} জন\n"
+            f"📜 Total Withdraw: {total_withdraw} বার\n"
+            f"📅 Joined: {u.get('joined_date', 'N/A')}\n"
+        )
+        await update.message.reply_text(msg)
+        return
+    
     if text == "📜 Balance History":
         pending = sum([h["amount"] for h in u["history"] if h["status"]=="PENDING"])
         total_times = len(u["history"])
