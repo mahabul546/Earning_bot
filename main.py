@@ -200,7 +200,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["step"]="number"
         await update.message.reply_text(f"আপনি {text} সিলেক্ট করেছেন। এখন আপনার {text} নাম্বার দিন:")
         return
-নতুন বসাইছি এখন থেকে 
+
 if text == "💬 Support":
         msg = (
             "🆘 Support Center\n\n"
@@ -209,7 +209,7 @@ if text == "💬 Support":
             "📲 Telegram: @myearn546\n\n"
             "⚡ দ্রুত সহায়তার জন্য সমস্যাটি বিস্তারিত জানান।"
         )
-    এখন পর্যন্ত 
+    
 
     if text == "📜 Balance History":
         pending = sum([h["amount"] for h in u["history"] if h["status"]=="PENDING"])
