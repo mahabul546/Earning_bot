@@ -5,6 +5,7 @@ from telegram.ext import Application, CommandHandler, CallbackQueryHandler, Mess
 
 TOKEN = os.getenv("BOT_TOKEN")
 ADMIN_ID = 7834320405
+ADMINS = [ADMIN_ID]
 DATA_FILE = "data.json"
 REQUIRED_CHANNEL = "@mhabul546"
 
