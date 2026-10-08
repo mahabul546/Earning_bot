@@ -227,6 +227,37 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await update.message.reply_text(msg)
         return
+
+    if text == "⚙️ Admin Panel":
+        if update.effective_user.id not in ADMINS:
+            await update.message.reply_text("❌ আপনি এডমিন না!")
+            return
+
+        admin_keyboard = [
+            ["👥 Total Users", "📊 Stats"],
+            ["📢 Broadcast", "💳 Withdraw Requests"],
+            ["🔙 Back"]
+        ]
+        await update.message.reply_text(
+            "⚙️ ADMIN PANEL\n\nএডমিন, স্বাগতম!",
+            reply_markup=ReplyKeyboardMarkup(admin_keyboard, resize_keyboard=True)
+        )
+        return
+
+    if text == "👥 Total Users":
+        if update.effective_user.id not in ADMINS:
+            return
+        total = len(data)
+        await update.message.reply_text(f"👥 মোট ইউজার: {total} জন")
+        return
+
+    if text == "📊 Stats":
+        if update.effective_user.id not in ADMINS:
+            return
+        total = len(data)
+        total_balance = sum([u.get('balance',0) for u in data.values()])
+        await update.message.reply_text(f"📊 Stats\n\n👥 Users: {total}\n💰 Total Balance: {total_balance} টাকা")
+        return
     
     if text == "📜 Balance History":
         pending = sum([h["amount"] for h in u["history"] if h["status"]=="PENDING"])
