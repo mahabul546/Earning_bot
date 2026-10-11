@@ -281,9 +281,8 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ], resize_keyboard=True)
         await update.message.reply_text("🎯 টাস্ক সিলেক্ট করুন 👇", reply_markup=kb)
         return
-
-if text == "📧 Gmail sell":
-    msg = """💰 কিভাবে এই প্ল্যাটফর্ম থেকে নিয়মিত ইনকাম করবেন?
+    if text == "📧 Gmail sell":
+        msg = """💰 কিভাবে এই প্ল্যাটফর্ম থেকে নিয়মিত ইনকাম করবেন?
 
 সম্পূর্ণ পদ্ধতি জানতে ভিডিওটি দেখুন ⬇️
 
@@ -301,19 +300,24 @@ if text == "📧 Gmail sell":
 
 কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
 
-    kb = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],
-        [InlineKeyboardButton("💳 Withdraw Video", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
-        [InlineKeyboardButton("📦 বেশি দামে বিক্রির ভিডিও", url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
-        [InlineKeyboardButton("🔗 Registration", url="https://t.me/Mahabul545erningbot")]
-    ])
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],
+            [InlineKeyboardButton("💳 Withdraw Video", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
+            [InlineKeyboardButton("📦 বেশি দামে বিক্রির ভিডিও", url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
+            [InlineKeyboardButton("🔗 Registration", url="https://t.me/Mahabul545erningbot")]
+        ])
 
-    await update.message.reply_text(msg, reply_markup=kb, disable_web_page_preview=True)
-    return
-
-
-
+        await update.message.reply_text(msg, reply_markup=kb, disable_web_page_preview=True)
+        return
     
+    if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
+        await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
+        return
+
+    if text == "👥 My Referrals":
+
+
+Tui age bol ei cod kaj korbe na
     if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
         await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
         return
