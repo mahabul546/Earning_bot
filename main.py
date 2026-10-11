@@ -294,7 +294,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ➡️ মিনিমাম : 0.60 সেন্ট = ৫০ টাকা
 
-🧢 Ther (vsjdbsj): 0358863581823
+🧢 Ther (vsjdbsj): <code>0358863581823</code>
 
 কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
 
@@ -305,7 +305,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("🔗 Registration", url="https://t.me/Mahabul545erningbot")]
         ])
 
-        await update.message.reply_text(msg, reply_markup=kb, disable_web_page_preview=True)
+        await update.message.reply_text(msg, reply_markup=kb, parse_mode="HTML", disable_web_page_preview=True)
         return
     
     if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
