@@ -313,11 +313,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
         await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
         return
-
-    if text == "👥 My Referrals":
-
-
-Tui age bol ei cod kaj korbe na
+        
     if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
         await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
         return
