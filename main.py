@@ -282,7 +282,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🎯 টাস্ক সিলেক্ট করুন 👇", reply_markup=kb)
         return
 
-    if text in ["📧 Gmail sell", "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
+    if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
         await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
         return
         
@@ -303,6 +303,37 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "🔙 Back":
         await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=ReplyKeyboardMarkup(USER_MENU if int(uid)!=ADMIN_ID else ADMIN_MENU, resize_keyboard=True))
         return
+
+
+if text == "📧 Gmail sell":
+    msg = """💰 কিভাবে এই প্ল্যাটফর্ম থেকে নিয়মিত ইনকাম করবেন?
+
+সম্পূর্ণ পদ্ধতি জানতে ভিডিওটি দেখুন ⬇️
+
+💳 কিভাবে সহজে Withdraw করে bKash / Nagad / Rocket-এ টাকা পাবেন
+
+ধাপে ধাপে জানতে ভিডিওটি দেখুন ⬇️
+
+💰 মাত্র ৩ ta ponno  = ৬৩ টাকা ইনকাম
+
+➡️ মিনিমাম : 0.60 সেন্ট = ৫০ টাকা
+
+🧢 Ther (0196008******): 
+
+0358863581823
+
+কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
+
+    kb = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],
+        [InlineKeyboardButton("💳 Withdraw Video", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
+        [InlineKeyboardButton("📦 বেশি দামে বিক্রির ভিডিও", url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
+        [InlineKeyboardButton("🔗 Registration", url="https://t.me/Mahabul545erningbot")]
+    ])
+
+    await update.message.reply_text(msg, reply_markup=kb, disable_web_page_preview=True)
+    return
+
 
 app = Application.builder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
