@@ -282,10 +282,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🎯 টাস্ক সিলেক্ট করুন 👇", reply_markup=kb)
         return
 
-    if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
-        await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
-        return
-
 if text == "📧 Gmail sell":
     msg = """💰 কিভাবে এই প্ল্যাটফর্ম থেকে নিয়মিত ইনকাম করবেন?
 
@@ -314,6 +310,13 @@ if text == "📧 Gmail sell":
 
     await update.message.reply_text(msg, reply_markup=kb, disable_web_page_preview=True)
     return
+
+
+
+    
+    if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
+        await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
+        return
 
 
     
