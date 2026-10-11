@@ -285,25 +285,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
         await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
         return
-        
-    if text == "👥 My Referrals":
-        total_ref = len(u.get("referrals", []))
-        withdraw_ref = u.get("withdraw_ref", 0)
-        bot_username = (await context.bot.get_me()).username
-        ref_link = f"https://t.me/{bot_username}?start={uid}"
-        msg = f"""💸 রেফার করে অটোমেটিক ইনকাম করুন!
-💲 প্রতি রেফার ২০ টাকা করে পাবেন
-👥 Total Referral: {total_ref}
-💵 Withdraw Referral: {withdraw_ref}
-🔗 Your Referral Link:\n{ref_link}
-⚠️ রেফার করা ইউজার withdraw করলে Withdraw Referral বাড়বে।"""
-        await update.message.reply_text(msg)
-        return
-
-    if text == "🔙 Back":
-        await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=ReplyKeyboardMarkup(USER_MENU if int(uid)!=ADMIN_ID else ADMIN_MENU, resize_keyboard=True))
-        return
-
 
 if text == "📧 Gmail sell":
     msg = """💰 কিভাবে এই প্ল্যাটফর্ম থেকে নিয়মিত ইনকাম করবেন?
@@ -334,6 +315,25 @@ if text == "📧 Gmail sell":
     await update.message.reply_text(msg, reply_markup=kb, disable_web_page_preview=True)
     return
 
+
+    
+    if text == "👥 My Referrals":
+        total_ref = len(u.get("referrals", []))
+        withdraw_ref = u.get("withdraw_ref", 0)
+        bot_username = (await context.bot.get_me()).username
+        ref_link = f"https://t.me/{bot_username}?start={uid}"
+        msg = f"""💸 রেফার করে অটোমেটিক ইনকাম করুন!
+💲 প্রতি রেফার ২০ টাকা করে পাবেন
+👥 Total Referral: {total_ref}
+💵 Withdraw Referral: {withdraw_ref}
+🔗 Your Referral Link:\n{ref_link}
+⚠️ রেফার করা ইউজার withdraw করলে Withdraw Referral বাড়বে।"""
+        await update.message.reply_text(msg)
+        return
+
+    if text == "🔙 Back":
+        await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=ReplyKeyboardMarkup(USER_MENU if int(uid)!=ADMIN_ID else ADMIN_MENU, resize_keyboard=True))
+        return
 
 app = Application.builder().token(TOKEN).build()
 app.add_handler(CommandHandler("start", start))
