@@ -294,9 +294,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ➡️ মিনিমাম : 0.60 সেন্ট = ৫০ টাকা
 
-🧢 Ther (0196008******): 
-
-0358863581823
+🧢 Ther (vsjdbsj): 0358863581823
 
 কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
 
