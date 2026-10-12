@@ -282,9 +282,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("🎯 টাস্ক সিলেক্ট করুন 👇", reply_markup=kb)
         return
     if text == "📧 Gmail sell":
-        msg = """💰 কিভাবে এই প্ল্যাটফর্ম থেকে নিয়মিত ইনকাম করবেন?
-
-সম্পূর্ণ পদ্ধতি জানতে ভিডিওটি দেখুন ⬇️
+        msg = """ সম্পূর্ণ পদ্ধতি জানতে ভিডিওটি দেখুন ⬇️
 
 💳 কিভাবে সহজে Withdraw করে bKash / Nagad / Rocket-এ টাকা পাবেন
 
@@ -294,7 +292,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ➡️ মিনিমাম : 0.60 সেন্ট = ৫০ টাকা
 
-🧢 Ther (vsjdbsj): <code>0358863581823</code>
+🧢 Ther (vsjdbsj): <code>0x35a886358182eb30396ed3e6a4334e4bf582e33c</code>
 
 কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
 
