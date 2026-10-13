@@ -58,7 +58,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]]
     await update.message.reply_text(text, reply_markup=InlineKeyboardMarkup(keyboard), disable_web_page_preview=True)
     if user.id == ADMIN_ID:
-        await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=ReplyKeyboardMarkup(ADMIN_MENU, resize_keyboard=True))
+        await update.message.reply_text("Select an action from the menu list 👇", reply_markup=ReplyKeyboardMarkup(ADMIN_MENU, resize_keyboard=True))
     admin_text = f"🔔 New User\nName: {user.full_name}\nUsername: @{user.username}\nID: {user.id}"
     kb = [[InlineKeyboardButton("✅ Approve", callback_data=f"approve_{user.id}"), InlineKeyboardButton("❌ Reject", callback_data=f"reject_{user.id}")]]
     try: await context.bot.send_message(ADMIN_ID, admin_text, reply_markup=InlineKeyboardMarkup(kb))
@@ -151,10 +151,14 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "📢 Notice":
         msg = """পেমেন্ট পাওয়ার নিয়ম
 পেমেন্ট পেতে হলে নিচের ২টি চ্যানেলেই জয়েন/সাবস্ক্রাইব করা বাধ্যতামূলক 👇
+
 📱 Telegram Channel: https://t.me/mhabul546
+
 ▶️ YouTube Channel: https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ
+
 ⚠️ গুরুত্বপূর্ণ: উপরের যেকোনো একটি চ্যানেলে জয়েন/সাবস্ক্রাইব না থাকলে পেমেন্ট দেওয়া হবে না।"""
-        kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")]]
+
+kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")]]
         await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(kb))
         return
 
@@ -205,9 +209,13 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "💬 Support":
         msg = (
             "🆘 Support Center\n\n"
+         
             "যেকোনো সমস্যায় আমাদের সাপোর্টে যোগাযোগ করুন। 💬\n\n"
+         
             "📱 WhatsApp: https://wa.me/8801980448738\n"
+         
             "📲 Telegram: @myearn546\n\n"
+       
             "⚡ দ্রুত সহায়তার জন্য সমস্যাটি বিস্তারিত জানান।"
         )
         await update.message.reply_text(msg)
@@ -218,12 +226,13 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ref_count = len(u.get("referrals", []))
         total_withdraw = len(u.get("history", []))
         msg = (
+          
             f"👤 MY ACCOUNT\n\n"
+         
             f"🆔 ID: {user.id}\n"
+          
             f"👤 Name: {user.first_name}\n"
-            f"💰 Balance: {u['balance']} টাকা\n"
-            f"👥 Total Refer: {ref_count} জন\n"
-            f"📜 Total Withdraw: {total_withdraw} বার\n"
+            
             f"📅 Joined: {u.get('joined_date', 'N/A')}\n"
         )
         await update.message.reply_text(msg)
@@ -268,7 +277,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             msg += "কোনো হিস্টরি নেই"
         else:
             for i, h in enumerate(reversed(u["history"][-10:]), 1):
-                msg += f"{i}. {h['amount']}৳ - {h['status']}\n📱 {h['method']} : {h['number']}\n📅 {h['date']}\n\n"
+                msg += f"{i}. {h['amount']}৳ - {h['status']}\n📱 {h['method']} : {h['number']}\n {h['date']}\n\n"
         await update.message.reply_text(msg)
         return
   
@@ -288,9 +297,9 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 ধাপে ধাপে জানতে ভিডিওটি দেখুন ⬇️
 
-💰 মাত্র ৩ ta ponno  = ৬৩ টাকা ইনকাম
+💰 মাত্র ৩ টা Gmail  = ৬৩ টাকা ইনকাম
 
-➡️ মিনিমাম : 0.60 সেন্ট = ৫০ টাকা
+➡️ মিনিমাম : 0.60 সেন্ট = ৫৫ টাকা
 
 🧢 Ther (vsjdbsj): <code>0x35a886358182eb30396ed3e6a4334e4bf582e33c</code>
 
@@ -298,9 +307,9 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],
-            [InlineKeyboardButton("💳 Withdraw Video", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
-            [InlineKeyboardButton("📦 বেশি দামে বিক্রির ভিডিও", url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
-            [InlineKeyboardButton("🔗 Registration", url="https://t.me/Mahabul545erningbot")]
+            [InlineKeyboardButton("🔗 Registration", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
+            [InlineKeyboardButton("💳 Withdraw Video, url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
+            [InlineKeyboardButton("👨‍👨‍👦 Sell to Sell 👨‍👨‍👦", url="https://t.me/Mahabul545erningbot")]
         ])
 
         await update.message.reply_text(msg, reply_markup=kb, parse_mode="HTML", disable_web_page_preview=True)
@@ -309,12 +318,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
         await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
         return
-        
-    if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
-        await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
-        return
-
-
     
     if text == "👥 My Referrals":
         total_ref = len(u.get("referrals", []))
@@ -322,16 +325,21 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_username = (await context.bot.get_me()).username
         ref_link = f"https://t.me/{bot_username}?start={uid}"
         msg = f"""💸 রেফার করে অটোমেটিক ইনকাম করুন!
+
 💲 প্রতি রেফার ২০ টাকা করে পাবেন
+
 👥 Total Referral: {total_ref}
+
 💵 Withdraw Referral: {withdraw_ref}
+
 🔗 Your Referral Link:\n{ref_link}
+
 ⚠️ রেফার করা ইউজার withdraw করলে Withdraw Referral বাড়বে।"""
         await update.message.reply_text(msg)
         return
 
     if text == "🔙 Back":
-        await update.message.reply_text("নিচ থেকে সিলেক্ট করুন 👇", reply_markup=ReplyKeyboardMarkup(USER_MENU if int(uid)!=ADMIN_ID else ADMIN_MENU, resize_keyboard=True))
+        await update.message.reply_text("Select an action from the menu list 👇", reply_markup=ReplyKeyboardMarkup(USER_MENU if int(uid)!=ADMIN_ID else ADMIN_MENU, resize_keyboard=True))
         return
 
 app = Application.builder().token(TOKEN).build()
