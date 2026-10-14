@@ -216,7 +216,7 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
          
             "📲 Telegram: @myearn546\n\n"
        
-            "⚡ দ্রুত সহায়তার জন্য সমস্যাটি বিস্তারিত জানান।"
+            " দ্রুত সহায়তার জন্য সমস্যাটি বিস্তারিত জানান।"
         )
         await update.message.reply_text(msg)
         return
