@@ -3,14 +3,18 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 */5 * * *'
-  push:
-    branches: [ main ]
+
+permissions:
+  contents: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -18,6 +22,9 @@ jobs:
       - run: python main.py
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          
-          
-          d
+      - run: |
+          git config user.name "bot"
+          git config user.email "bot@bot.com"
+          git add .
+          git commit -m "save data" || echo "no changes"
+          git push
