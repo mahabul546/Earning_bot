@@ -157,19 +157,16 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 ▶️ YouTube Channel: https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ
 
 ⚠️ গুরুত্বপূর্ণ: উপরের যেকোনো একটি চ্যানেলে জয়েন/সাবস্ক্রাইব না থাকলে পেমেন্ট দেওয়া হবে না।"""
-
-kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")]]
+        kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")]]
         await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(kb))
         return
 
     if text == "💰 Balance":
-        # === জয়েন চেক এখানে ===
         joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
             kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
-           await update.message.reply_text("❌ পেমেন্ট পেতে হলে আগে আমাদের চ্যানেলে জয়েন করতে হবে!\n\nজয়েন করে Check বাটনে চাপ দিন।", reply_markup=InlineKeyboardMarkup(kb))
+            await update.message.reply_text("❌ পেমেন্ট পেতে হলে আগে আমাদের চ্যানেলে জয়েন করতে হবে!\n\nজয়েন করে Check বাটনে চাপ দিন।", reply_markup=InlineKeyboardMarkup(kb))
             return
-        # জয়েন থাকলে ব্যালেন্স দেখাবে
         bal = u["balance"]
         msg = f"""বিঃদ্রঃ উইথড্র দেওয়া 2 ঘণ্টার মধ্যে পেমেন্ট দেয়া হবে
 
@@ -209,13 +206,9 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
     if text == "💬 Support":
         msg = (
             "🆘 Support Center\n\n"
-         
             "যেকোনো সমস্যায় আমাদের সাপোর্টে যোগাযোগ করুন। 💬\n\n"
-         
             "📱 WhatsApp: https://wa.me/8801980448738\n"
-         
             "📲 Telegram: @myearn546\n\n"
-       
             " দ্রুত সহায়তার জন্য সমস্যাটি বিস্তারিত জানান।"
         )
         await update.message.reply_text(msg)
@@ -223,16 +216,10 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
 
     if text == "👤 My accounts":
         user = update.effective_user
-        ref_count = len(u.get("referrals", []))
-        total_withdraw = len(u.get("history", []))
         msg = (
-          
             f"👤 MY ACCOUNT\n\n"
-         
             f"🆔 ID: {user.id}\n"
-          
             f"👤 Name: {user.first_name}\n"
-            
             f"📅 Joined: {u.get('joined_date', 'N/A')}\n"
         )
         await update.message.reply_text(msg)
@@ -242,7 +229,6 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
         if update.effective_user.id not in ADMINS:
             await update.message.reply_text("❌ আপনি এডমিন না!")
             return
-
         admin_keyboard = [
             ["👥 Total Users", "📊 Stats"],
             ["📢 Broadcast", "💳 Withdraw Requests"],
@@ -268,7 +254,7 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
         total_balance = sum([u.get('balance',0) for u in data.values()])
         await update.message.reply_text(f"📊 Stats\n\n👥 Users: {total}\n💰 Total Balance: {total_balance} টাকা")
         return
-    
+
     if text == "📜 Balance History":
         pending = sum([h["amount"] for h in u["history"] if h["status"]=="PENDING"])
         total_times = len(u["history"])
@@ -280,7 +266,7 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
                 msg += f"{i}. {h['amount']}৳ - {h['status']}\n📱 {h['method']} : {h['number']}\n {h['date']}\n\n"
         await update.message.reply_text(msg)
         return
-  
+
     if text == "🎯 Tasks":
         kb = ReplyKeyboardMarkup([
             ["📧 Gmail sell", "💬 Whatsapp sell"],
@@ -290,6 +276,7 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
         ], resize_keyboard=True)
         await update.message.reply_text("🎯 টাস্ক সিলেক্ট করুন 👇", reply_markup=kb)
         return
+
     if text == "📧 Gmail sell":
         msg = """ সম্পূর্ণ পদ্ধতি জানতে ভিডিওটি দেখুন ⬇️
 
@@ -297,7 +284,7 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
 
 ধাপে ধাপে জানতে ভিডিওটি দেখুন ⬇️
 
-💰 মাত্র ৩ টা Gmail  = ৬৩ টাকা ইনকাম
+💰 মাত্র ৩ টা Gmail = ৬৩ টাকা ইনকাম
 
 ➡️ মিনিমাম : 0.60 সেন্ট = ৫৫ টাকা
 
@@ -308,17 +295,16 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],
             [InlineKeyboardButton("🔗 Registration", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
-            [InlineKeyboardButton("💳 Withdraw Video, url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
+            [InlineKeyboardButton("💳 Withdraw Video", url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
             [InlineKeyboardButton("👨‍👨‍👦 Sell to Sell 👨‍👨‍👦", url="https://t.me/Mahabul545erningbot")]
         ])
-
         await update.message.reply_text(msg, reply_markup=kb, parse_mode="HTML", disable_web_page_preview=True)
         return
-    
+
     if text in [ "💬 Whatsapp sell", "🎥 Videos earn", "▶️ YouTube", "💳 Recharge", "🌐 Website visit"]:
         await update.message.reply_text(f"🔧 {text} - কাজ চলছে, খুব শীঘ্রই আপডেট আসবে!")
         return
-    
+
     if text == "👥 My Referrals":
         total_ref = len(u.get("referrals", []))
         withdraw_ref = u.get("withdraw_ref", 0)
@@ -332,7 +318,8 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
 
 💵 Withdraw Referral: {withdraw_ref}
 
-🔗 Your Referral Link:\n{ref_link}
+🔗 Your Referral Link:
+{ref_link}
 
 ⚠️ রেফার করা ইউজার withdraw করলে Withdraw Referral বাড়বে।"""
         await update.message.reply_text(msg)
