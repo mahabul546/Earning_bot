@@ -326,7 +326,7 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
         ref_link = f"https://t.me/{bot_username}?start={uid}"
         msg = f"""💸 রেফার করে অটোমেটিক ইনকাম করুন!
 
-💲 প্রতি রেফার ২০ টাকা করে পাবেন
+💲 প্রতি রেফার ২০ টাকা করে পাবেন paben
 
 👥 Total Referral: {total_ref}
 
