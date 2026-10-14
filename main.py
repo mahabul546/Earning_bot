@@ -167,7 +167,7 @@ kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")]
         joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
             kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
-            await update.message.reply_text("❌ পেমেন্ট পেতে হলে আগে আমাদের চ্যানেলে জয়েন করতে হবে!\n\nজয়েন করে Check বাটনে চাপ দিন।", reply_markup=InlineKeyboardMarkup(kb))
+           await update.message.reply_text("❌ পেমেন্ট পেতে হলে আগে আমাদের চ্যানেলে জয়েন করতে হবে!\n\nজয়েন করে Check বাটনে চাপ দিন।", reply_markup=InlineKeyboardMarkup(kb))
             return
         # জয়েন থাকলে ব্যালেন্স দেখাবে
         bal = u["balance"]
