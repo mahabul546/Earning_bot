@@ -225,34 +225,68 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg)
         return
 
+    # === ADMIN PANEL FULL CODE ===
+# এই কোডগুলো তোমার handle_buttons এর ভিতরে বসবে
+
     if text == "⚙️ Admin Panel":
-        if update.effective_user.id not in ADMINS:
-            await update.message.reply_text("❌ আপনি এডমিন না!")
-            return
-        admin_keyboard = [
+        if update.effective_user.id not in ADMINS: return
+        kb = [
             ["👥 Total Users", "📊 Stats"],
             ["📢 Broadcast", "💳 Withdraw Requests"],
+            ["💰 Balance Add", "🔍 Search User"],
+            ["🚫 Block/Unblock", "👤 Pending Users"],
             ["🔙 Back"]
         ]
-        await update.message.reply_text(
-            "⚙️ ADMIN PANEL\n\nএডমিন, স্বাগতম!",
-            reply_markup=ReplyKeyboardMarkup(admin_keyboard, resize_keyboard=True)
-        )
+        await update.message.reply_text("⚙️ ADMIN PANEL", reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True))
         return
 
     if text == "👥 Total Users":
-        if update.effective_user.id not in ADMINS:
-            return
-        total = len(data)
-        await update.message.reply_text(f"👥 মোট ইউজার: {total} জন")
+        await update.message.reply_text(f"👥 Total: {len(data)} জন")
         return
 
     if text == "📊 Stats":
-        if update.effective_user.id not in ADMINS:
-            return
-        total = len(data)
-        total_balance = sum([u.get('balance',0) for u in data.values()])
-        await update.message.reply_text(f"📊 Stats\n\n👥 Users: {total}\n💰 Total Balance: {total_balance} টাকা")
+        total_bal = sum(v.get('balance',0) for v in data.values())
+        await update.message.reply_text(f"📊 Users: {len(data)}\n💰 Balance: {total_bal}৳")
+        return
+
+    if text == "📢 Broadcast":
+        context.user_data["admin_action"]="broadcast"
+        await update.message.reply_text("📢 Broadcast মেসেজ লিখুন:")
+        return
+
+    if text == "💳 Withdraw Requests":
+        msg="💳 Pending:\n\n"
+        found=False
+        for uid_key, ud in data.items():
+            for h in ud.get("history",[]):
+                if h["status"]=="PENDING":
+                    msg+=f"ID:{uid_key} - {h['amount']}৳ {h['method']} {h['number']} | {h['id']}\n\n"
+                    found=True
+        if not found: msg="কোনো Pending নাই"
+        await update.message.reply_text(msg[:4000])
+        return
+
+    if text == "💰 Balance Add":
+        context.user_data["admin_action"]="balance_add"
+        await update.message.reply_text("লিখুন: UserID Amount\nEx: 12345 100 বা 12345 -50")
+        return
+
+    if text == "🔍 Search User":
+        context.user_data["admin_action"]="search_user"
+        await update.message.reply_text("User ID লিখুন:")
+        return
+
+    if text == "🚫 Block/Unblock":
+        context.user_data["admin_action"]="block_user"
+        await update.message.reply_text("Block/Unblock করতে User ID লিখুন:")
+        return
+
+    if text == "👤 Pending Users":
+        msg="Last 15 Users:\n"
+        for uid_key in list(data.keys())[-15:]:
+            ud=data[uid_key]
+            msg+=f"{uid_key} - {ud.get('balance',0)}৳ Block:{ud.get('blocked',False)}\n"
+        await update.message.reply_text(msg)
         return
 
     if text == "📜 Balance History":
