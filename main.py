@@ -266,14 +266,39 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg[:4000])
         return
 
-    if text == "💰 Balance Add":
+        if text == "💰 Balance Add":
+        if update.effective_user.id not in ADMINS: return
         context.user_data["admin_action"]="balance_add"
-        await update.message.reply_text("লিখুন: UserID Amount\nEx: 12345 100 বা 12345 -50")
+        await update.message.reply_text("💰 ID আর টাকা লিখুন:\nEx: 12345 100")
         return
 
-    if text == "🔍 Search User":
-        context.user_data["admin_action"]="search_user"
-        await update.message.reply_text("User ID লিখুন:")
+    # এটা admin_action এর ভিতরে বসাবে
+    if admin_action=="balance_add":
+        try:
+            tid, amt = text.split()
+            amt = int(amt)
+            target = get_user(data, tid)
+            target["balance"] += amt
+            save_data(data)
+            
+            # একসাথে Add + Search
+            await update.message.reply_text(
+                f"✅ Balance Update Done!\n\n"
+                f"🆔 User ID: {tid}\n"
+                f"💰 {'+' if amt>0 else ''}{amt}৳ {'যোগ' if amt>0 else 'কাটা'} হলো\n"
+                f"💵 বর্তমান ব্যালেন্স: {target['balance']} টাকা\n"
+                f"👥 রেফার: {len(target.get('referrals',[]))} জন\n"
+                f"🚫 Block: {'হ্যাঁ' if target.get('blocked') else 'না'}\n"
+                f"📜 মোট উইথড্র: {len(target.get('history',[]))} বার"
+            )
+            try:
+                await context.bot.send_message(tid, f"💰 আপনার ব্যালেন্সে {amt}৳ যোগ হয়েছে! নতুন ব্যালেন্স: {target['balance']}৳")
+            except: pass
+            
+        except:
+            await update.message.reply_text("❌ ভুল! এভাবে লিখুন: 12345 100")
+        
+        context.user_data["admin_action"]=None
         return
 
     if text == "🚫 Block/Unblock":
