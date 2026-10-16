@@ -267,7 +267,8 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
         if text == "💰 Balance Add":
-        if update.effective_user.id not in ADMINS: return
+        if update.effective_user.id not in ADMINS:
+    return
         context.user_data["admin_action"]="balance_add"
         await update.message.reply_text("💰 ID আর টাকা লিখুন:\nEx: 12345 100")
         return
