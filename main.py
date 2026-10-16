@@ -225,9 +225,20 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg)
         return
 
-    # === ADMIN PANEL FULL CODE ===
+    # === ADMIN PANEL baton CODE ===
 
-
+    if text == "⚙️ Admin Panel":
+        if update.effective_user.id not in ADMINS:
+            return
+        kb = [
+            ["👥 Total Users", "📊 Stats"],
+            ["💳 Withdraw Requests", "🔍 Search Pending"],
+            ["💰 Balance Add", "💰 Balance Remove"],
+            ["🚫 Block / Unblock", "📢 Broadcast"],
+            ["🔙 Back"]
+        ]
+        await update.message.reply_text("⚙️ ADMIN PANEL", reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True))
+        return
     if text == "📜 Balance History":
         pending = sum([h["amount"] for h in u["history"] if h["status"]=="PENDING"])
         total_times = len(u["history"])
