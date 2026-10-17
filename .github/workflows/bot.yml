@@ -2,7 +2,7 @@ name: Bot Runner
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */5 * * *'
+    - cron: '0 */4 * * *'
 
 permissions:
   contents: write
@@ -10,7 +10,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 260
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,12 +19,12 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install -r requirements.txt
-      - run: python main.py
+      - run: timeout 14400 python -u main.py || true
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       - run: |
           git config user.name "bot"
           git config user.email "bot@bot.com"
-          git add .
-          git commit -m "save data" || echo "no changes"
-          git push
+          git add data.json || true
+          git commit -m "auto save data" || echo "no changes"
+          git push || echo "push failed"
