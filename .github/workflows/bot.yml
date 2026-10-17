@@ -1,30 +1,32 @@
 name: Bot Runner
+
+concurrency:
+  group: bot-runner
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 */4 * * *'
-
-permissions:
-  contents: write
+  push:
+    branches: [main]
 
 jobs:
-  run:
+  run-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 260
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: timeout 14400 python -u main.py || true
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install python-telegram-bot
+
+      - name: Run bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      - run: |
-          git config user.name "bot"
-          git config user.email "bot@bot.com"
-          git add data.json || true
-          git commit -m "auto save data" || echo "no changes"
-          git push || echo "push failed"
+        run: |
+          python main.py
