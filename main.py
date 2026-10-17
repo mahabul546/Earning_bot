@@ -103,32 +103,34 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
 async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
+    text = update.message.text.strip() if update.message.text else ""
     uid = str(update.effective_user.id)
     data = load_data()
     u = get_user(data, uid)
 
-    # === FIX: এই লাইনটা না থাকার জন্যই Bot Crash করছিলো ===
-    admin_action = context.user_data.get("admin_action")
+    # === 1. BACK সবার আগে - নাহলে আটকে যাবে ===
+    if text == "🔙 Back":
+        context.user_data.clear()
+        main = ADMIN_MENU if int(uid)==ADMIN_ID else USER_MENU
+        await update.message.reply_text("Select an action from the menu list 👇", reply_markup=ReplyKeyboardMarkup(main, resize_keyboard=True))
+        return
 
-    # === এই নতুন 4 লাইন বসাও, তাহলেই আটকাবে না ===
-    admin_buttons = ["👥 Total Users", "📊 Stats", "💳 Withdraw Requests", "🔍 Search Pending", "💰 Balance Add", "💰 Balance Remove", "🚫 Block / Unblock", "📢 Broadcast", "⚙️ Admin Panel", "🔙 Back"]
-    if text in admin_buttons and text != "💰 Balance Add" and text != "💰 Balance Remove":
+    admin_action = context.user_data.get("admin_action")
+    admin_buttons = ["👥 Total Users", "📊 Stats", "💳 Withdraw Requests", "🔍 Search Pending", "💰 Balance Add", "💰 Balance Remove", "🚫 Block / Unblock", "📢 Broadcast", "⚙️ Admin Panel"]
+    if text in admin_buttons and text not in ["💰 Balance Add", "💰 Balance Remove"]:
         context.user_data["admin_action"] = None
         admin_action = None
-    # === শেষ ===
 
     if admin_action == "find_user_for_balance":
-    
-        target = data.get(text.strip())
+        target = data.get(text)
         if not target:
             await update.message.reply_text("❌ User পাওয়া যায়নি! আবার ID দিন:")
             return
-        context.user_data["edit_target_id"] = text.strip()
+        context.user_data["edit_target_id"] = text
         context.user_data["admin_action"] = "edit_balance_amount"
         bal = target.get('balance', 0)
         name = target.get('first_name', 'N/A')
-        msg = f"👤 User Found!\n\n📛 Name: {name}\n🆔 ID: {text.strip()}\n💰 Balance: {bal}৳\n\n+100 লিখলে যোগ হবে\n-50 লিখলে কাটবে\nEx: +100"
+        msg = f"👤 User Found!\n\n📛 Name: {name}\n🆔 ID: {text}\n💰 Balance: {bal}৳\n\n+100 লিখলে যোগ হবে\n-50 লিখলে কাটবে\nEx: +100"
         await update.message.reply_text(msg)
         return
 
@@ -136,7 +138,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             target_id = context.user_data.get("edit_target_id")
             target = get_user(data, target_id)
-            amount = int(text.strip())
+            amount = int(text)
             target["balance"] += amount
             if target["balance"] < 0:
                 target["balance"] = 0
@@ -147,15 +149,53 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ ভুল! +100 বা -50 লিখুন")
         return
 
+    # === 2. PAYOUT FIX - ওপর থেকে নিচে + ভুল নাম্বার আটকানো ===
+    if text == "💸 Payout":
+        joined = await check_joined(context.bot, update.effective_user.id)
+        if not joined:
+            kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
+            await update.message.reply_text("❌ পেমেন্ট নিতে হলে আগে চ্যানেলে জয়েন করুন!", reply_markup=InlineKeyboardMarkup(kb))
+            return
+        if u["balance"] < 50:
+            await update.message.reply_text(f"❌ আপনার ব্যালেন্স {u['balance']} টাকা, মিনিমাম 50 টাকা লাগবে!")
+            return
+        context.user_data.clear()
+        kb = ReplyKeyboardMarkup([
+            ["Bikas"],
+            ["Nogod"],
+            ["Rocket"],
+            ["🔙 Back"]
+        ], resize_keyboard=True)
+        await update.message.reply_text("পেমেন্ট মেথড সিলেক্ট করুন:", reply_markup=kb)
+        return
+
+    if text in ["Bikas", "Nogod", "Rocket"]:
+        joined = await check_joined(context.bot, update.effective_user.id)
+        if not joined:
+            await update.message.reply_text("❌ আগে চ্যানেলে জয়েন করুন!")
+            return
+        if u["balance"] < 50:
+            await update.message.reply_text("❌ 50 টাকার নিচে উইথড্র হবে না!")
+            return
+        context.user_data["method"]=text
+        context.user_data["step"]="number"
+        kb = ReplyKeyboardMarkup([["🔙 Back"]], resize_keyboard=True)
+        await update.message.reply_text(f"আপনি {text} সিলেক্ট করেছেন। এখন আপনার {text} নাম্বার দিন:", reply_markup=kb)
+        return
+
     if context.user_data.get("step") == "number":
+        if not text.isdigit() or len(text) != 11 or not text.startswith("01"):
+            await update.message.reply_text("❌ ভুল নাম্বার! সঠিক 11 ডিজিটের নাম্বার দিন\nযেমন: 01712345678")
+            return
         context.user_data["number"]=text
         context.user_data["step"]="amount"
-        await update.message.reply_text("এখন কত টাকা উইথড্র করবেন লিখুন (মিনিমাম 50):")
+        await update.message.reply_text("✅ নাম্বার ঠিক আছে। এখন কত টাকা উইথড্র করবেন লিখুন (মিনিমাম 50):")
         return
+
     if context.user_data.get("step") == "amount":
         try: amount = int(text)
         except:
-            await update.message.reply_text("❌ সঠিক সংখ্যা লিখুন!")
+            await update.message.reply_text("❌ সঠিক সংখ্যা লিখুন! যেমন: 100")
             return
         if amount < 50:
             await update.message.reply_text("❌ 50 টাকার নিচে উইথড্র করা যাবে না!")
@@ -190,11 +230,8 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "📢 Notice":
         msg = """পেমেন্ট পাওয়ার নিয়ম
 পেমেন্ট পেতে হলে নিচের ২টি চ্যানেলেই জয়েন/সাবস্ক্রাইব করা বাধ্যতামূলক 👇
-
 📱 Telegram Channel: https://t.me/mhabul546
-
 ▶️ YouTube Channel: https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ
-
 ⚠️ গুরুত্বপূর্ণ: উপরের যেকোনো একটি চ্যানেলে জয়েন/সাবস্ক্রাইব না থাকলে পেমেন্ট দেওয়া হবে না।"""
         kb = [[InlineKeyboardButton("📱 Telegram Join", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")]]
         await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(kb))
@@ -208,38 +245,10 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         bal = u["balance"]
         msg = f"""বিঃদ্রঃ উইথড্র দেওয়া 2 ঘণ্টার মধ্যে পেমেন্ট দেয়া হবে
-
 আপনার ব্যালেন্স💰 : {bal} টাকা
-
 মিনিম্যাম উইথড্র 50 টাকা"""
         kb = ReplyKeyboardMarkup([["💸 Payout", "📜 Balance History"], ["🔙 Back"]], resize_keyboard=True)
         await update.message.reply_text(msg, reply_markup=kb)
-        return
-
-    if text == "💸 Payout":
-        joined = await check_joined(context.bot, update.effective_user.id)
-        if not joined:
-            kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
-            await update.message.reply_text("❌ পেমেন্ট নিতে হলে আগে চ্যানেলে জয়েন করুন!", reply_markup=InlineKeyboardMarkup(kb))
-            return
-        if u["balance"] < 50:
-            await update.message.reply_text(f"❌ আপনার ব্যালেন্স {u['balance']} টাকা, মিনিমাম 50 টাকা লাগবে!")
-            return
-        kb = ReplyKeyboardMarkup([["Bikas", "Nogod", "Rocket"], ["🔙 Back"]], resize_keyboard=True)
-        await update.message.reply_text("পেমেন্ট মেথড সিলেক্ট করুন:", reply_markup=kb)
-        return
-
-    if text in ["Bikas", "Nogod", "Rocket"]:
-        joined = await check_joined(context.bot, update.effective_user.id)
-        if not joined:
-            await update.message.reply_text("❌ আগে চ্যানেলে জয়েন করুন!")
-            return
-        if u["balance"] < 50:
-            await update.message.reply_text("❌ 50 টাকার নিচে উইথড্র হবে না!")
-            return
-        context.user_data["method"]=text
-        context.user_data["step"]="number"
-        await update.message.reply_text(f"আপনি {text} সিলেক্ট করেছেন। এখন আপনার {text} নাম্বার দিন:")
         return
 
     if text == "💬 Support":
@@ -308,17 +317,11 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if text == "📧 Gmail sell":
         msg = """ সম্পূর্ণ পদ্ধতি জানতে ভিডিওটি দেখুন ⬇️
-
 💳 কিভাবে সহজে Withdraw করে bKash / Nagad / Rocket-এ টাকা পাবেন
-
 ধাপে ধাপে জানতে ভিডিওটি দেখুন ⬇️
-
 💰 মাত্র ৩ টা Gmail = ৬৩ টাকা ইনকাম
-
 ➡️ মিনিমাম : 0.60 সেন্ট = ৫৫ টাকা
-
 🧢 Ther (vsjdbsj): <code>0x35a886358182eb30396ed3e6a4334e4bf582e33c</code>
-
 কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
 
         kb = InlineKeyboardMarkup([
@@ -340,22 +343,13 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_username = (await context.bot.get_me()).username
         ref_link = f"https://t.me/{bot_username}?start={uid}"
         msg = f"""💸 রেফার করে অটোমেটিক ইনকাম করুন!
-
 💲 প্রতি রেফার ২০ টাকা করে পাবেন paben
-
 👥 Total Referral: {total_ref}
-
 💵 Withdraw Referral: {withdraw_ref}
-
 🔗 Your Referral Link:
 {ref_link}
-
 ⚠️ রেফার করা ইউজার withdraw করলে Withdraw Referral বাড়বে।"""
         await update.message.reply_text(msg)
-        return
-
-    if text == "🔙 Back":
-        await update.message.reply_text("Select an action from the menu list 👇", reply_markup=ReplyKeyboardMarkup(USER_MENU if int(uid)!=ADMIN_ID else ADMIN_MENU, resize_keyboard=True))
         return
 
 app = Application.builder().token(TOKEN).build()
