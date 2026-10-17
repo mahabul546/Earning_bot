@@ -111,8 +111,15 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # === FIX: এই লাইনটা না থাকার জন্যই Bot Crash করছিলো ===
     admin_action = context.user_data.get("admin_action")
 
-    # === FIX: Balance Edit Logic সবার উপরে আনলাম, যাতে কাজ করে ===
+    # === এই নতুন 4 লাইন বসাও, তাহলেই আটকাবে না ===
+    admin_buttons = ["👥 Total Users", "📊 Stats", "💳 Withdraw Requests", "🔍 Search Pending", "💰 Balance Add", "💰 Balance Remove", "🚫 Block / Unblock", "📢 Broadcast", "⚙️ Admin Panel", "🔙 Back"]
+    if text in admin_buttons and text != "💰 Balance Add" and text != "💰 Balance Remove":
+        context.user_data["admin_action"] = None
+        admin_action = None
+    # === শেষ ===
+
     if admin_action == "find_user_for_balance":
+    
         target = data.get(text.strip())
         if not target:
             await update.message.reply_text("❌ User পাওয়া যায়নি! আবার ID দিন:")
