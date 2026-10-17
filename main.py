@@ -108,6 +108,38 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     u = get_user(data, uid)
 
+    # === FIX: এই লাইনটা না থাকার জন্যই Bot Crash করছিলো ===
+    admin_action = context.user_data.get("admin_action")
+
+    # === FIX: Balance Edit Logic সবার উপরে আনলাম, যাতে কাজ করে ===
+    if admin_action == "find_user_for_balance":
+        target = data.get(text.strip())
+        if not target:
+            await update.message.reply_text("❌ User পাওয়া যায়নি! আবার ID দিন:")
+            return
+        context.user_data["edit_target_id"] = text.strip()
+        context.user_data["admin_action"] = "edit_balance_amount"
+        bal = target.get('balance', 0)
+        name = target.get('first_name', 'N/A')
+        msg = f"👤 User Found!\n\n📛 Name: {name}\n🆔 ID: {text.strip()}\n💰 Balance: {bal}৳\n\n+100 লিখলে যোগ হবে\n-50 লিখলে কাটবে\nEx: +100"
+        await update.message.reply_text(msg)
+        return
+
+    if admin_action == "edit_balance_amount":
+        try:
+            target_id = context.user_data.get("edit_target_id")
+            target = get_user(data, target_id)
+            amount = int(text.strip())
+            target["balance"] += amount
+            if target["balance"] < 0:
+                target["balance"] = 0
+            save_data(data)
+            await update.message.reply_text(f"✅ Done! ID: {target_id}\n💰 {amount}৳ | Now: {target['balance']}৳\n\nআবার ID দিন বা 🔙 Back চাপুন")
+            context.user_data["admin_action"] = "find_user_for_balance"
+        except:
+            await update.message.reply_text("❌ ভুল! +100 বা -50 লিখুন")
+        return
+
     if context.user_data.get("step") == "number":
         context.user_data["number"]=text
         context.user_data["step"]="amount"
@@ -225,8 +257,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(msg)
         return
 
-    # === ADMIN PANEL baton CODE ===
-
     if text == "⚙️ Admin Panel":
         if update.effective_user.id not in ADMINS:
             return
@@ -239,44 +269,12 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
         await update.message.reply_text("⚙️ ADMIN PANEL", reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True))
         return
-    # === 1. BALANCE BUTTON - এটা নিচের বাটনগুলোর সাথে থাকবে ===
-    if text == "💰 Balance Add":
+
+    if text == "💰 Balance Add" or text == "💰 Balance Remove":
         if update.effective_user.id not in ADMINS:
             return
         context.user_data["admin_action"] = "find_user_for_balance"
         await update.message.reply_text("💰 ব্যালেন্স এডিট করতে User ID দিন:")
-        return
-
-    # === 2. EDIT LOGIC - এটা উপরে যেখানে if admin_action == ... আছে সেখানে বসবে ===
-    # কিন্তু আমি একসাথে দিলাম যাতে তুমি খুঁজে পাও
-    
-    # উপরের দিকে (handle_buttons এর শুরুতেই) এই 2 টা if বসাও:
-    if admin_action == "find_user_for_balance":
-        target = data.get(text.strip())
-        if not target:
-            await update.message.reply_text("❌ User পাওয়া যায়নি! আবার ID দিন:")
-            return
-        context.user_data["edit_target_id"] = text.strip()
-        context.user_data["admin_action"] = "edit_balance_amount"
-        bal = target.get('balance', 0)
-        name = target.get('first_name', 'N/A')
-        msg = f"👤 User Found!\n\n📛 Name: {name}\n🆔 ID: {text.strip()}\n💰 Balance: {bal}৳\n\n+100 লিখলে যোগ হবে\n-50 লিখলে কাটবে\nEx: +100"
-        await update.message.reply_text(msg)
-        return
-
-    if admin_action == "edit_balance_amount":
-        try:
-            target_id = context.user_data.get("edit_target_id")
-            target = get_user(data, target_id)
-            amount = int(text.strip())
-            target["balance"] += amount
-            if target["balance"] < 0:
-                target["balance"] = 0
-            save_data(data)
-            await update.message.reply_text(f"✅ Done! ID: {target_id}\n💰 {amount}৳ | Now: {target['balance']}৳\n\nআবার ID দিন")
-            context.user_data["admin_action"] = "find_user_for_balance"
-        except:
-            await update.message.reply_text("❌ ভুল! +100 বা -50 লিখুন")
         return
     
     if text == "📜 Balance History":
