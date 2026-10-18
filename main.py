@@ -151,7 +151,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # === 2. PAYOUT FIX - ওপর থেকে নিচে + ভুল নাম্বার আটকানো ===
         if text == "💸 Payout":
-        joined = await check_joined(context.bot, update.effective_user.id)
+            joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
             kb = [
                 [InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],
