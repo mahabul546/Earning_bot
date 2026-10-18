@@ -153,7 +153,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "💸 Payout":
         joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
-                        kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
+           kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
             await update.message.reply_text("❌ পেমেন্ট নিতে হলে আগে চ্যানেলে জয়েন করুন!", reply_markup=InlineKeyboardMarkup(kb))
             return
         if u["balance"] < 50:
@@ -240,7 +240,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "💰 Balance":
         joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
-                        kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
+           kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
             await update.message.reply_text("❌ পেমেন্ট পেতে হলে আগে আমাদের চ্যানেলে জয়েন করতে হবে!\n\nজয়েন করে Check বাটনে চাপ দিন।", reply_markup=InlineKeyboardMarkup(kb))
             return
         bal = u["balance"]
