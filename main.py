@@ -13,13 +13,27 @@ USER_MENU = [["👥 My Referrals", "🎯 Tasks"], ["💰 Balance", "📢 Notice"
 ADMIN_MENU = [["👥 My Referrals", "🎯 Tasks"], ["💰 Balance", "📢 Notice"], ["💬 Support", "👤 My accounts"], ["⚙️ Admin Panel"]]
 
 def load_data():
-    if not os.path.exists(DATA_FILE): return {}
+    if not os.path.exists(DATA_FILE):
+        return {}
     try:
-        with open(DATA_FILE, "r") as f: return json.load(f)
-    except: return {}
+        with open(DATA_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {}
 
 def save_data(data):
-    with open(DATA_FILE, "w") as f: json.dump(data, f)
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+    # === PERMANENT FIX: data.json GitHub এ অটো সেভ হবে ===
+    try:
+        os.system('git config --global user.email "bot@auto.com" > /dev/null 2>&1')
+        os.system('git config --global user.name "auto-bot" > /dev/null 2>&1')
+        os.system(f'git add {DATA_FILE} > /dev/null 2>&1')
+        # যদি পরিবর্তন থাকে তবেই commit
+        os.system('git diff --cached --quiet || git commit -m "auto save data.json [skip ci]" > /dev/null 2>&1')
+        os.system('git push > /dev/null 2>&1 || true')
+    except:
+        pass
 
 def get_user(data, uid):
     uid=str(uid)
@@ -91,6 +105,8 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if "approve_" in q.data or "reject_" in q.data:
         uid = q.data.split("_")[1]
+        u = get_user(data, uid)
+        save_data(data)
         if "approve" in q.data:
             kb = [[InlineKeyboardButton("👉 Video 👈", url="https://youtube.com/shorts/q7sZG9w9PhA?si=LYnMkkFQcwt32Mm7")]]
             await context.bot.send_message(chat_id=uid, text="✅ আপনার আইডি Active করা হয়েছে!", reply_markup=InlineKeyboardMarkup(kb))
@@ -108,7 +124,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     u = get_user(data, uid)
 
-    # === 1. BACK সবার আগে - নাহলে আটকে যাবে ===
     if text == "🔙 Back":
         context.user_data.clear()
         main = ADMIN_MENU if int(uid)==ADMIN_ID else USER_MENU
@@ -124,7 +139,12 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if admin_action == "find_user_for_balance":
         target = data.get(text)
         if not target:
-            await update.message.reply_text("❌ User পাওয়া যায়নি! আবার ID দিন:")
+            # এখন আর error দেবে না, না থাকলেও বানিয়ে নেবে
+            target = get_user(data, text)
+            save_data(data)
+            await update.message.reply_text(f"⚠️ এই ID আগে ছিল না, নতুন তৈরি করা হলো!\nID: {text}\nএখন + - দিন:")
+            context.user_data["edit_target_id"] = text
+            context.user_data["admin_action"] = "edit_balance_amount"
             return
         context.user_data["edit_target_id"] = text
         context.user_data["admin_action"] = "edit_balance_amount"
@@ -149,7 +169,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ ভুল! +100 বা -50 লিখুন")
         return
 
-    # === 2. PAYOUT FIX - ওপর থেকে নিচে + ভুল নাম্বার আটকানো ===
     if text == "💸 Payout":
         joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
@@ -327,7 +346,6 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 ➡️ মিনিমাম : 0.60 সেন্ট = ৫৫ টাকা
 🧢 Ther (vsjdbsj): <code>0x35a886358182eb30396ed3e6a4334e4bf582e33c</code>
 কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
-
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],
             [InlineKeyboardButton("🔗 Registration", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
