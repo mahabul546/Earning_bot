@@ -150,7 +150,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # === 2. PAYOUT FIX - ওপর থেকে নিচে + ভুল নাম্বার আটকানো ===
-            if text == "💸 Payout":
+        if text == "💸 Payout":
         joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
             kb = [
