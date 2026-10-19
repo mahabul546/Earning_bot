@@ -35,11 +35,17 @@ def save_data(data):
     except:
         pass
 
-def get_user(data, uid):
+def get_user(data, uid, effective_user=None):
     uid=str(uid)
     if uid not in data:
-        data[uid]={"balance":0, "referrals":[], "withdraw_ref":0, "referred_by":None, "history":[]}
+        data[uid]={"balance":0, "referrals":[], "withdraw_ref":0, "referred_by":None, "history":[], "first_name": "N/A", "username": "N/A", "full_name": "N/A"}
     if "history" not in data[uid]: data[uid]["history"]=[]
+    if "first_name" not in data[uid]: data[uid]["first_name"]="N/A"
+    # যদি ইউজারের আসল Telegram অবজেক্ট পাওয়া যায়, তাহলে নাম আপডেট করো
+    if effective_user:
+        data[uid]["first_name"] = effective_user.first_name
+        data[uid]["username"] = f"@{effective_user.username}" if effective_user.username else "N/A"
+        data[uid]["full_name"] = effective_user.full_name
     return data[uid]
 
 async def check_joined(bot, user_id):
