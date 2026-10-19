@@ -24,12 +24,10 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=2)
-    # === PERMANENT FIX: data.json GitHub এ অটো সেভ হবে ===
     try:
         os.system('git config --global user.email "bot@auto.com" > /dev/null 2>&1')
         os.system('git config --global user.name "auto-bot" > /dev/null 2>&1')
         os.system(f'git add {DATA_FILE} > /dev/null 2>&1')
-        # যদি পরিবর্তন থাকে তবেই commit
         os.system('git diff --cached --quiet || git commit -m "auto save data.json [skip ci]" > /dev/null 2>&1')
         os.system('git push > /dev/null 2>&1 || true')
     except:
@@ -41,7 +39,6 @@ def get_user(data, uid, effective_user=None):
         data[uid]={"balance":0, "referrals":[], "withdraw_ref":0, "referred_by":None, "history":[], "first_name": "N/A", "username": "N/A", "full_name": "N/A"}
     if "history" not in data[uid]: data[uid]["history"]=[]
     if "first_name" not in data[uid]: data[uid]["first_name"]="N/A"
-    # যদি ইউজারের আসল Telegram অবজেক্ট পাওয়া যায়, তাহলে নাম আপডেট করো
     if effective_user:
         data[uid]["first_name"] = effective_user.first_name
         data[uid]["username"] = f"@{effective_user.username}" if effective_user.username else "N/A"
@@ -61,13 +58,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
     if args and args[0]!= str(user.id):
         ref_id = args[0]
-        u = get_user(data, user.id)
+        u = get_user(data, user.id, user)
         if not u["referred_by"]:
             u["referred_by"]=ref_id
             r = get_user(data, ref_id)
             if str(user.id) not in r["referrals"]:
                 r["referrals"].append(str(user.id))
             save_data(data)
+    else:
+        get_user(data, user.id, user)
+        save_data(data)
 
     text = f"""⏳ Start : পেন্ডিং
 📮 Post : আপনার আইডি unactive কিভাবে একটিভ করবেন নিচে তার ভিডিও দেওয়া হলো 👇
@@ -88,7 +88,6 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
     data = load_data()
-
     if q.data == "check_join":
         joined = await check_joined(context.bot, q.from_user.id)
         if joined:
@@ -96,7 +95,6 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await q.answer("❌ এখনো জয়েন করেন নাই!", show_alert=True)
         return
-
     if "withdraw_paid_" in q.data:
         wid = q.data.split("_")[-1]
         uid = q.data.split("_")[-2]
@@ -108,7 +106,6 @@ async def btn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_message(uid, f"✅ আপনার {h['amount']}৳ পেমেন্ট PAID করা হয়েছে!")
                 await q.edit_message_text(f"✅ {uid} এর {wid} PAID করা হলো")
                 return
-
     if "approve_" in q.data or "reject_" in q.data:
         uid = q.data.split("_")[1]
         u = get_user(data, uid)
@@ -128,7 +125,8 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip() if update.message.text else ""
     uid = str(update.effective_user.id)
     data = load_data()
-    u = get_user(data, uid)
+    u = get_user(data, uid, update.effective_user)
+    save_data(data)
 
     if text == "🔙 Back":
         context.user_data.clear()
@@ -142,10 +140,40 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["admin_action"] = None
         admin_action = None
 
+    # ====== নতুন ২টা - আগের কিছু ডিলিট হয়নি ======
+    if text == "👥 Total Users":
+        if int(uid) not in ADMINS: return
+        total = len([k for k in data.keys() if k.isdigit()])
+        msg = f"👥 Total Users: {total} জন\n\n"
+        for k,v in list(data.items())[-20:]:
+            if not k.isdigit(): continue
+            msg += f"{v.get('first_name','N/A')} - {k} - {v.get('balance',0)}৳\n"
+        await update.message.reply_text(msg)
+        return
+
+    if text == "📊 Stats":
+        if int(uid) not in ADMINS: return
+        total_users = len([k for k in data.keys() if k.isdigit()])
+        total_bal = sum(v.get('balance',0) for v in data.values())
+        total_ref = sum(len(v.get('referrals',[])) for v in data.values())
+        pending_c = 0
+        pending_t = 0
+        for v in data.values():
+            for h in v.get('history',[]):
+                if h.get('status')=="PENDING":
+                    pending_c+=1
+                    pending_t+=h.get('amount',0)
+        msg = f"📊 STATS\n\n👥 Total Users: {total_users}\n💰 Total Balance: {total_bal}৳\n👥 Total Referral: {total_ref}\n⏳ Pending: {pending_c} টা ({pending_t}৳)"
+        await update.message.reply_text(msg)
+        return
+    # ====== নতুন ২টা শেষ ======
+
     if admin_action == "find_user_for_balance":
         target = data.get(text)
         if not target:
-            # এখন আর error দেবে না, না থাকলেও বানিয়ে নেবে
+            if not text.isdigit():
+                await update.message.reply_text(f"❌ ভুল ID! শুধু নাম্বার দিন\nতুমি দিয়েছো: {text}")
+                return
             target = get_user(data, text)
             save_data(data)
             await update.message.reply_text(f"⚠️ এই ID আগে ছিল না, নতুন তৈরি করা হলো!\nID: {text}\nএখন + - দিন:")
@@ -178,23 +206,14 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "💸 Payout":
         joined = await check_joined(context.bot, update.effective_user.id)
         if not joined:
-            kb = [
-                [InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],
-                [InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")],
-                [InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]
-            ]
+            kb = [[InlineKeyboardButton("📱 Join Channel", url="https://t.me/mhabul546")],[InlineKeyboardButton("▶️ YouTube Subscribe", url="https://youtube.com/@mahabul546?si=Vy6Zhd1l1P8jeNfJ")],[InlineKeyboardButton("✅ I Joined - Check", callback_data="check_join")]]
             await update.message.reply_text("❌ পেমেন্ট নিতে হলে আগে চ্যানেলে জয়েন করুন!", reply_markup=InlineKeyboardMarkup(kb))
             return
         if u["balance"] < 50:
             await update.message.reply_text(f"❌ আপনার ব্যালেন্স {u['balance']} টাকা, মিনিমাম 50 টাকা লাগবে!")
             return
         context.user_data.clear()
-        kb = ReplyKeyboardMarkup([
-            ["Bikas"],
-            ["Nogod"],
-            ["Rocket"],
-            ["🔙 Back"]
-        ], resize_keyboard=True)
+        kb = ReplyKeyboardMarkup([["Bikas"],["Nogod"],["Rocket"],["🔙 Back"]], resize_keyboard=True)
         await update.message.reply_text("পেমেন্ট মেথড সিলেক্ট করুন:", reply_markup=kb)
         return
 
@@ -281,37 +300,20 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if text == "💬 Support":
-        msg = (
-            "🆘 Support Center\n\n"
-            "যেকোনো সমস্যায় আমাদের সাপোর্টে যোগাযোগ করুন। 💬\n\n"
-            "📱 WhatsApp: https://wa.me/8801980448738\n"
-            "📲 Telegram: @myearn546\n\n"
-            " দ্রুত সহায়তার জন্য সমস্যাটি বিস্তারিত জানান।"
-        )
+        msg = ("🆘 Support Center\n\nযেকোনো সমস্যায় আমাদের সাপোর্টে যোগাযোগ করুন। 💬\n\n📱 WhatsApp: https://wa.me/8801980448738\n📲 Telegram: @myearn546\n\n দ্রুত সহায়তার জন্য সমস্যাটি বিস্তারিত জানান।")
         await update.message.reply_text(msg)
         return
 
     if text == "👤 My accounts":
         user = update.effective_user
-        msg = (
-            f"👤 MY ACCOUNT\n\n"
-            f"🆔 ID: {user.id}\n"
-            f"👤 Name: {user.first_name}\n"
-            f"📅 Joined: {u.get('joined_date', 'N/A')}\n"
-        )
+        msg = (f"👤 MY ACCOUNT\n\n🆔 ID: {user.id}\n👤 Name: {user.first_name}\n📅 Joined: {u.get('joined_date', 'N/A')}\n")
         await update.message.reply_text(msg)
         return
 
     if text == "⚙️ Admin Panel":
         if update.effective_user.id not in ADMINS:
             return
-        kb = [
-            ["👥 Total Users", "📊 Stats"],
-            ["💳 Withdraw Requests", "🔍 Search Pending"],
-            ["💰 Balance Add", "💰 Balance Remove"],
-            ["🚫 Block / Unblock", "📢 Broadcast"],
-            ["🔙 Back"]
-        ]
+        kb = [["👥 Total Users", "📊 Stats"],["💳 Withdraw Requests", "🔍 Search Pending"],["💰 Balance Add", "💰 Balance Remove"],["🚫 Block / Unblock", "📢 Broadcast"],["🔙 Back"]]
         await update.message.reply_text("⚙️ ADMIN PANEL", reply_markup=ReplyKeyboardMarkup(kb, resize_keyboard=True))
         return
 
@@ -335,12 +337,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if text == "🎯 Tasks":
-        kb = ReplyKeyboardMarkup([
-            ["📧 Gmail sell", "💬 Whatsapp sell"],
-            ["🎥 Videos earn", "▶️ YouTube"],
-            ["💳 Recharge", "🌐 Website visit"],
-            ["🔙 Back"]
-        ], resize_keyboard=True)
+        kb = ReplyKeyboardMarkup([["📧 Gmail sell", "💬 Whatsapp sell"],["🎥 Videos earn", "▶️ YouTube"],["💳 Recharge", "🌐 Website visit"],["🔙 Back"]], resize_keyboard=True)
         await update.message.reply_text("🎯 টাস্ক সিলেক্ট করুন 👇", reply_markup=kb)
         return
 
@@ -352,12 +349,7 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 ➡️ মিনিমাম : 0.60 সেন্ট = ৫৫ টাকা
 🧢 Ther (vsjdbsj): <code>0x35a886358182eb30396ed3e6a4334e4bf582e33c</code>
 কিভাবে বেশি দামে বিক্রি করবেন তার ভিডিও নিচে দেওয়া হলো"""
-        kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],
-            [InlineKeyboardButton("🔗 Registration", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],
-            [InlineKeyboardButton("💳 Withdraw Video", url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],
-            [InlineKeyboardButton("👨‍👨‍👦 Sell to Sell 👨‍👨‍👦", url="https://t.me/Mahabul545erningbot")]
-        ])
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton("🎥 Income Video", url="https://youtu.be/1FQIGuWkw5A?si=eP_aWUEZbGfzlcMC")],[InlineKeyboardButton("🔗 Registration", url="https://youtu.be/uOS30DdJW74?si=Koe_Ueww8ByhxA6-")],[InlineKeyboardButton("💳 Withdraw Video", url="https://youtu.be/TBNw7WSaYoo?si=tLDRjNWw5HMu3xwu")],[InlineKeyboardButton("👨‍👨‍👦 Sell to Sell 👨‍👨‍👦", url="https://t.me/Mahabul545erningbot")]])
         await update.message.reply_text(msg, reply_markup=kb, parse_mode="HTML", disable_web_page_preview=True)
         return
 
