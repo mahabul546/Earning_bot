@@ -23,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install python-telegram-bot
+          pip install -r requirements.txt
 
       - name: Run bot
         env:
