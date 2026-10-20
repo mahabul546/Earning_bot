@@ -1,32 +1,58 @@
 name: Bot Runner
-
-concurrency:
-  group: bot-runner
-  cancel-in-progress: true
-
 on:
-  workflow_dispatch:
   push:
     branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */5 * * *'  # 5 ঘন্টা পর পর চেক করবে, Off থাকলে On করবে
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+    timeout-minutes: 345  # 5h 45m পর GitHub কেটে দেবে, 6h এর আগেই
+
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Install
+        run: pip install python-telegram-bot
 
-      - name: Run bot
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      - name: Run Bot for 5h 40m - Auto Reset
         run: |
-          python main.py
+          echo "Starting bot... will auto-restart after 5h 40m"
+          # 5h 40m = 20400 seconds
+          timeout 20400 python main.py || true
+          
+          echo "Saving data before restart..."
+          git config --global user.email "bot@auto.com"
+          git config --global user.name "auto-bot"
+          git add data.json || true
+          git diff --cached --quiet || git commit -m "auto save before restart [skip ci]" || true
+          git push || true
+          
+          echo "Restarting workflow..."
+          sleep 10
+          # নিজে নিজে আবার চালু হওয়ার জন্য API কল
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/bot.yml/dispatches \
+            -d '{"ref":"main"}' || true
+
+      - name: Force Restart if timed out
+        if: always()
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/bot.yml/dispatches \
+            -d '{"ref":"main"}' || true
