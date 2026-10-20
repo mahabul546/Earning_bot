@@ -168,6 +168,63 @@ async def handle_buttons(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     # ====== নতুন ২টা শেষ ======
 
+    if text == "💳 Withdraw Requests":
+        if int(uid) not in ADMINS: return
+        data = load_data()
+        pending_list = []
+        for user_id, udata in data.items():
+            if not user_id.isdigit(): continue
+            for h in udata.get("history", []):
+                if h.get("status") == "PENDING":
+                    pending_list.append((user_id, udata.get("first_name","N/A"), h))
+        
+        if not pending_list:
+            await update.message.reply_text("✅ কোনো Pending Withdraw নেই")
+            return
+
+        msg = f"💳 PENDING WITHDRAW: {len(pending_list)} টা\n\n"
+        kb_buttons = []
+        for user_id, name, h in pending_list[:15]: # প্রথম 15 টা দেখাবে, বেশি হলে লোড বেশি হবে
+            msg += f"👤 {name} | {user_id}\n💰 {h['amount']}৳ | {h['method']} | {h['number']}\n🆔 WID: {h['id']} | {h['date']}\n\n"
+            kb_buttons.append([InlineKeyboardButton(f"✅ PAID {h['amount']}৳ - {user_id}", callback_data=f"withdraw_paid_{user_id}_{h['id']}")])
+        
+        if len(pending_list) > 15:
+            msg += f"...আরও {len(pending_list)-15} টা Pending আছে"
+
+        await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(kb_buttons))
+        return
+
+    if text == "🔍 Search Pending":
+        if int(uid) not in ADMINS: return
+        context.user_data["admin_action"] = "search_pending"
+        await update.message.reply_text("🔍 যে ইউজারের Pending দেখতে চাও তার User ID দাও:")
+        return
+
+    if admin_action == "search_pending":
+        target_id = text.strip()
+        target = data.get(target_id)
+        if not target:
+            await update.message.reply_text(f"❌ এই ID পাওয়া যায়নি: {target_id}")
+            return
+        
+        pending = [h for h in target.get("history", []) if h.get("status")=="PENDING"]
+        if not pending:
+            await update.message.reply_text(f"✅ {target_id} এর কোনো Pending নেই\nName: {target.get('first_name','N/A')}\nBalance: {target.get('balance',0)}৳")
+            context.user_data["admin_action"] = None
+            return
+
+        msg = f"🔍 Pending for {target_id}\n👤 {target.get('first_name','N/A')}\n💰 Balance: {target.get('balance',0)}৳\n\n"
+        kb_buttons = []
+        for h in pending:
+            msg += f"💰 {h['amount']}৳ | {h['method']} | {h['number']}\n🆔 {h['id']} | {h['date']}\n\n"
+            kb_buttons.append([InlineKeyboardButton(f"✅ PAID {h['amount']}৳", callback_data=f"withdraw_paid_{target_id}_{h['id']}")])
+
+        await update.message.reply_text(msg, reply_markup=InlineKeyboardMarkup(kb_buttons))
+        context.user_data["admin_action"] = None
+        return
+          # ====== নতুন ২টা শেষ ======
+    
+    
     if admin_action == "find_user_for_balance":
         target = data.get(text)
         if not target:
