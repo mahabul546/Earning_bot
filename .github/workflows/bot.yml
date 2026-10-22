@@ -1,1 +1,27 @@
+name: Bot Runner
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
 
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pip install python-telegram-bot
+      - name: Run bot 5h40m
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: |
+          timeout 20400 python main.py || true
+          git config user.email "bot@auto.com"
+          git config user.name "Auto Bot"
+          git add data.json || true
+          git commit -m "save [skip ci]" || true
+          git push || true
