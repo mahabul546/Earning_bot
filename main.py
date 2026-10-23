@@ -24,14 +24,7 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=2)
-    try:
-        os.system('git config --global user.email "bot@auto.com" > /dev/null 2>&1')
-        os.system('git config --global user.name "auto-bot" > /dev/null 2>&1')
-        os.system(f'git add {DATA_FILE} > /dev/null 2>&1')
-        os.system('git diff --cached --quiet || git commit -m "auto save data.json [skip ci]" > /dev/null 2>&1')
-        os.system('git push > /dev/null 2>&1 || true')
-    except:
-        pass
+    
 
 def get_user(data, uid, effective_user=None):
     uid=str(uid)
