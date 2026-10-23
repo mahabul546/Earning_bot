@@ -1,27 +1,43 @@
-name: Bot Runner
+name: Telegram Bot
+
 on:
+  push:
+    branches: [ main ]
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */5 * * *'
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Install
-        run: pip install python-telegram-bot
-      - name: Run bot 5h40m
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          python-version: '3.10'
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Run Bot and Auto Save Data
         run: |
-          timeout 20400 python main.py || true
-          git config user.email "bot@auto.com"
-          git config user.name "Auto Bot"
+          git config --global user.email "bot@github.com"
+          git config --global user.name "Bot Saver"
+          timeout 17400 python main.py &
+          BOT_PID=$!
+          echo "Bot started with PID $BOT_PID"
+          while kill -0 $BOT_PID 2>/dev/null; do
+            sleep 1800
+            git add data.json || true
+            if ! git diff --cached --quiet; then
+              git commit -m "auto save data [skip ci]" || true
+              git push || true
+            fi
+          done
           git add data.json || true
-          git commit -m "save [skip ci]" || true
-          git push || true
+          git diff --cached --quiet || (git commit -m "final save [skip ci]" && git push)
