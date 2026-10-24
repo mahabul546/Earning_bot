@@ -1,1 +1,31 @@
-{}
+{
+  "7834320405": {
+    "balance": 0,
+    "referrals": [],
+    "withdraw_ref": 0,
+    "referred_by": null,
+    "history": [],
+    "first_name": "Mahabul",
+    "username": "@myearn546",
+    "full_name": "Mahabul Islam"
+  },
+  "8022985989": {
+    "balance": 950,
+    "referrals": [],
+    "withdraw_ref": 0,
+    "referred_by": null,
+    "history": [
+      {
+        "id": 1792825531,
+        "amount": 50,
+        "method": "Bikas",
+        "number": "01960080221",
+        "status": "PAID",
+        "date": "24/10/2026 | 07:05 AM"
+      }
+    ],
+    "first_name": "Mahabul",
+    "username": "@Mahabul546",
+    "full_name": "Mahabul Islam"
+  }
+}
