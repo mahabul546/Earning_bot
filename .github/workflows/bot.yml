@@ -25,6 +25,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Bot and Auto Save Data
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           git config --global user.email "bot@github.com"
           git config --global user.name "Bot Saver"
