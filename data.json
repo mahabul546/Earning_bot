@@ -1,7 +1,9 @@
 {
   "7834320405": {
     "balance": 0,
-    "referrals": [],
+    "referrals": [
+      "6733608890"
+    ],
     "withdraw_ref": 0,
     "referred_by": null,
     "history": [],
@@ -27,5 +29,15 @@
     "first_name": "Mahabul",
     "username": "@Mahabul546",
     "full_name": "Mahabul Islam"
+  },
+  "6733608890": {
+    "balance": 50000,
+    "referrals": [],
+    "withdraw_ref": 0,
+    "referred_by": "7834320405",
+    "history": [],
+    "first_name": "Rokon",
+    "username": "N/A",
+    "full_name": "Rokon hasan"
   }
 }
