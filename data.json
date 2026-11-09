@@ -1,13 +1,22 @@
 {
   "7834320405": {
-    "balance": 20000,
+    "balance": 19000,
     "referrals": [
       "6733608890",
       "8022985989"
     ],
     "withdraw_ref": 0,
     "referred_by": null,
-    "history": [],
+    "history": [
+      {
+        "id": 1794195454,
+        "amount": 1000,
+        "method": "Rocket",
+        "number": "01980448738",
+        "status": "PAID",
+        "date": "09/11/2026 | 03:37 AM"
+      }
+    ],
     "first_name": "Mahabul",
     "username": "@myearn546",
     "full_name": "Mahabul Islam"
